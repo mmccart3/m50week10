@@ -1,42 +1,40 @@
 import {writeCookie} from "../utils/utilities"
 
-function Login(parameter) {
-    async function login(username,  password, setLoggedIn, setMessage) {
+function Register(parameter) {
+    async function registerUser(username, email, password) {
         try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/users/login`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/users/register`, {
                 method: "POST",
                 headers:{"Content-Type" : "application/json"},
                 body: JSON.stringify({
                     username: username,
+                    email: email,
                     password: password
                 })
             })
             const data = await response.json()
-            console.log(data)
-            if (data.message === "login successful, new token issued") {
-                writeCookie("jwt_token", data.user.token, 7)
-                setLoggedIn(true)
-                setMessage(data.message)
-            } else {
-                setLoggedIn(false)
-                setMessage(data.message)
-            }
-            } catch (error) {
+            console.log(data.user.token)
+            writeCookie("jwt_token", data.user.token, 7)
+            parameter.setLoggedIn(true)
+        } catch (error) {
             console.log(error)
         }
     }
     function handleSubmit(event) {
         event.preventDefault();
-        login(parameter.username, parameter.password, parameter.setLoggedIn, parameter.setMessage);
+        registerUser(parameter.username, parameter.email, parameter.password);
     }
     return (
         <div>
-            <hr></hr>
-        <h2>Login User</h2>
+                        <hr></hr>
+        <h2>Register User</h2>
         <form onSubmit={handleSubmit}>
 
             <label for="name">Enter your username: </label>
             <input onChange = {(event) => parameter.setUsername(event.target.value) } type="text" className="name" id="name" required />
+            <br></br>
+            <label for="email">Enter your email: </label>
+            <input onChange = {(event) => parameter.setEmail(event.target.value) }type="email" name="email" id="email" required />
             <br></br>
             <label for="password">Enter your password: </label>
 
@@ -51,4 +49,4 @@ function Login(parameter) {
     )
 };
 
-export default Login;
+export default Register;
